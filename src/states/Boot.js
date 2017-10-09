@@ -21,7 +21,12 @@ export default class extends Phaser.State {
 
     game.load.tilemap('level1', './assets/map/level1.json', null, Phaser.Tilemap.TILED_JSON)
     game.load.image('tiles-1', './assets/images/tiles-1.png')
-    game.load.spritesheet('dude', './assets/images/dude.png', 32, 48)
+    
+    game.load.image('crusher', './assets/images/crusher.png')
+    game.load.image('crusher-bullet', './assets/images/crusher-bullet.png')
+
+
+    game.load.spritesheet('jack', './assets/images/jack.png', 32, 48)
     game.load.spritesheet('droid', './assets/images/droid.png', 32, 32)
     game.load.image('starSmall', './assets/images/star.png')
     game.load.image('starBig', './assets/images/star2.png')

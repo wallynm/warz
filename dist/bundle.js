@@ -4234,7 +4234,7 @@ module.exports = Math.scale || function scale(x, inLow, inHigh, outLow, outHigh)
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! babel-polyfill */129);
-module.exports = __webpack_require__(/*! /Users/wallyson/www/stickwars/src/main.js */331);
+module.exports = __webpack_require__(/*! /Users/wallyson/www/warz/src/main.js */331);
 
 
 /***/ }),
@@ -10645,7 +10645,11 @@ window.game = new Game();
 
     game.load.tilemap('level1', './assets/map/level1.json', null, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Tilemap.TILED_JSON);
     game.load.image('tiles-1', './assets/images/tiles-1.png');
-    game.load.spritesheet('dude', './assets/images/dude.png', 32, 48);
+
+    game.load.image('crusher', './assets/images/crusher.png');
+    game.load.image('crusher-bullet', './assets/images/crusher-bullet.png');
+
+    game.load.spritesheet('jack', './assets/images/jack.png', 32, 48);
     game.load.spritesheet('droid', './assets/images/droid.png', 32, 32);
     game.load.image('starSmall', './assets/images/star.png');
     game.load.image('starBig', './assets/images/star2.png');
@@ -10729,9 +10733,12 @@ const centerGameObjects = objects => {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__sprites_Mushroom__ = __webpack_require__(/*! ../sprites/Mushroom */ 340);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__sprites_Player__ = __webpack_require__(/*! ../sprites/Player */ 341);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_characters_Mushroom__ = __webpack_require__(/*! ../objects/characters/Mushroom */ 345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_characters_Jack__ = __webpack_require__(/*! ../objects/characters/Jack */ 344);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__objects_items_Crusher__ = __webpack_require__(/*! ../objects/items/Crusher */ 346);
 /* globals __DEV__ */
+
+
 
 
 
@@ -10742,7 +10749,6 @@ const centerGameObjects = objects => {
 
   create() {
     game.physics.startSystem(__WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE);
-    console.info(game);
     game.stage.backgroundColor = '#000000';
 
     const bg = game.add.tileSprite(0, 0, 800, 600, 'background');
@@ -10756,7 +10762,7 @@ const centerGameObjects = objects => {
     layer.resizeWorld();
 
     //  Un-comment this on to see the collision tiles
-    layer.debug = true;
+    // layer.debug = true;
 
     // layer.resizeWorld();
 
@@ -10771,29 +10777,154 @@ const centerGameObjects = objects => {
     banner.smoothed = false;
     banner.anchor.setTo(0.5);
 
-    this.player = new __WEBPACK_IMPORTED_MODULE_2__sprites_Player__["a" /* default */]({
+    this.items = [new __WEBPACK_IMPORTED_MODULE_3__objects_items_Crusher__["a" /* default */]({
       layer,
-      game: this.game,
+      bullets: 0,
+      // player: this.player,
       x: this.world.centerX,
-      y: this.world.centerY,
-      asset: 'dude'
+      y: this.world.centerY
+    })];
+
+    this.player = new __WEBPACK_IMPORTED_MODULE_2__objects_characters_Jack__["a" /* default */]({
+      items: this.items,
+      layer,
+      x: this.world.centerX,
+      y: this.world.centerY
     });
-
-    this.game.add.existing(this.player);
-  }
-
-  render() {
-    // if (__DEV__) {
-    //   this.game.debug.spriteInfo(this.mushroom, 32, 32)
-    // }
   }
 });
 
 /***/ }),
-/* 340 */
-/*!*********************************!*\
-  !*** ./src/sprites/Mushroom.js ***!
-  \*********************************/
+/* 340 */,
+/* 341 */,
+/* 342 */
+/*!***********************!*\
+  !*** ./src/config.js ***!
+  \***********************/
+/*! exports provided: default */
+/*! exports used: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+  gameWidth: 760,
+  gameHeight: 400,
+  localStorageName: 'phaseres6webpack'
+});
+
+/***/ }),
+/* 343 */,
+/* 344 */
+/*!****************************************!*\
+  !*** ./src/objects/characters/Jack.js ***!
+  \****************************************/
+/*! exports provided: default */
+/*! exports used: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
+  constructor({ x, y, layer, items }) {
+    super(game, x, y, "jack");
+    this.items = items;
+    this.layer = layer;
+    this.anchor.setTo(0.5);
+    this.cursors = game.input.keyboard.createCursorKeys();
+    this.jumpButton = game.input.keyboard.addKey(__WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Keyboard.SPACEBAR);
+    this.facing = 'left';
+    this.jumpTimer = 0;
+    this.equipedWeapon = null;
+
+    this.addItems();
+
+    // console.info('omg', this)
+
+    game.physics.enable(this, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE);
+    game.camera.follow(this);
+
+    // this.game.add.sprite(32, 32, 'dude');
+
+    this.body.bounce.y = 0.2;
+    this.body.collideWorldBounds = true;
+    this.body.setSize(20, 32, 5, 16);
+
+    this.animations.add("left", [0, 1, 2, 3], 10, true);
+    this.animations.add("turn", [4], 20, true);
+    this.animations.add("right", [5, 6, 7, 8], 10, true);
+    this.game.add.existing(this);
+  }
+
+  addItems() {
+    this.items.forEach(item => {
+      item.anchor.setTo(0.2);
+      this.addChild(item);
+      item.x = 0;
+      this.equipedWeapon = this.items.indexOf(item);
+    });
+  }
+
+  update() {
+    game.physics.arcade.collide(this, this.layer);
+    const weapon = this.items[this.equipedWeapon];
+    const rotation = game.physics.arcade.angleToPointer(this);
+
+    if (this.equipedWeapon !== null) {
+      if (game.input.activePointer.isDown) {
+        weapon.fire();
+      }
+    }
+
+    game.physics.arcade.collide(this, this.layer);
+    this.body.velocity.x = 0;
+
+    if (this.cursors.left.isDown) {
+      this.body.velocity.x = -150;
+
+      if (this.facing != "left") {
+        this.animations.play("left");
+        this.facing = "left";
+      }
+    } else if (this.cursors.right.isDown) {
+      this.body.velocity.x = 150;
+
+      if (this.facing != "right") {
+        this.animations.play("right");
+        this.facing = "right";
+      }
+    } else {
+      // if (this.facing != "idle") {
+      this.animations.stop();
+
+      if (this.facing == "left") {
+        this.frame = 0;
+      } else {
+        this.frame = 5;
+      }
+
+      // this.facing = "idle";
+      // }
+    }
+
+    if (weapon) {
+      weapon.rotate(this.facing, rotation);
+    }
+
+    if (this.jumpButton.isDown && this.body.onFloor() && game.time.now > this.jumpTimer) {
+      this.body.velocity.y = -250;
+      this.jumpTimer = game.time.now + 750;
+    }
+  }
+});
+
+/***/ }),
+/* 345 */
+/*!********************************************!*\
+  !*** ./src/objects/characters/Mushroom.js ***!
+  \********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10816,10 +10947,10 @@ const centerGameObjects = objects => {
 });
 
 /***/ }),
-/* 341 */
-/*!*******************************!*\
-  !*** ./src/sprites/Player.js ***!
-  \*******************************/
+/* 346 */
+/*!**************************************!*\
+  !*** ./src/objects/items/Crusher.js ***!
+  \**************************************/
 /*! exports provided: default */
 /*! exports used: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -10827,86 +10958,206 @@ const centerGameObjects = objects => {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__FireWeapon__ = __webpack_require__(/*! ./FireWeapon */ 347);
 
 
-/* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
-    constructor({ game, x, y, layer }) {
-        super(game, x, y, 'dude');
-        this.layer = layer;
-        this.anchor.setTo(0.5);
-        this.cursors = game.input.keyboard.createCursorKeys();
-        this.jumpButton = game.input.keyboard.addKey(__WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Keyboard.SPACEBAR);
-        this.facing = 'left';
-        this.jumpTimer = 0;
 
-        game.physics.enable(this, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE);
-        game.camera.follow(this);
-
-        // this.game.add.sprite(32, 32, 'dude');
-
-        this.body.bounce.y = 0.2;
-        this.body.collideWorldBounds = true;
-        this.body.setSize(20, 32, 5, 16);
-
-        this.animations.add('left', [0, 1, 2, 3], 10, true);
-        this.animations.add('turn', [4], 20, true);
-        this.animations.add('right', [5, 6, 7, 8], 10, true);
-    }
-
-    update() {
-        game.physics.arcade.collide(this, this.layer);
-        this.body.velocity.x = 0;
-
-        if (this.cursors.left.isDown) {
-            this.body.velocity.x = -150;
-
-            if (this.facing != 'left') {
-                this.animations.play('left');
-                this.facing = 'left';
-            }
-        } else if (this.cursors.right.isDown) {
-            this.body.velocity.x = 150;
-
-            if (this.facing != 'right') {
-                this.animations.play('right');
-                this.facing = 'right';
-            }
-        } else {
-            if (this.facing != 'idle') {
-                this.animations.stop();
-
-                if (this.facing == 'left') {
-                    this.frame = 0;
-                } else {
-                    this.frame = 5;
-                }
-
-                this.facing = 'idle';
-            }
-        }
-
-        if (this.jumpButton.isDown && this.body.onFloor() && game.time.now > this.jumpTimer) {
-            this.body.velocity.y = -250;
-            this.jumpTimer = game.time.now + 750;
-        }
-    }
+/* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_1__FireWeapon__["a" /* default */] {
+  constructor({ bullets, layer, x, y }) {
+    super({ bullets, layer, x, y, name: 'crusher' });
+  }
 });
 
 /***/ }),
-/* 342 */
-/*!***********************!*\
-  !*** ./src/config.js ***!
-  \***********************/
+/* 347 */
+/*!*****************************************!*\
+  !*** ./src/objects/items/FireWeapon.js ***!
+  \*****************************************/
 /*! exports provided: default */
 /*! exports used: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony default export */ __webpack_exports__["a"] = ({
-  gameWidth: 760,
-  gameHeight: 400,
-  localStorageName: 'phaseres6webpack'
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
+// weapon = function(posx,posy,speed,frequency,angular){
+
+
+// 	this.posx=posx
+// 	this.posy=posy
+// 	this.flag_explode=false
+// 	this.speed=speed
+// 	this.angular=angular
+// 	this.frequency=frequency
+
+// 	//canon
+// 	Phaser.Sprite.call(this,game,this.posx,this.posy,'canon')
+// 	this.anchor.setTo(.5,.5)
+// 	this.angle=this.angular
+// 	game.physics.arcade.enable(this);
+// 	this.weapon=game.add.weapon(9,'bullet')	
+// 	this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+// 	//  Because our bullet is drawn facing up, we need to offset its rotation:
+// 	this.weapon.bulletAngleOffset = 0;
+
+// 	//  The speed at which the bullet is fired
+// 	this.weapon.bulletSpeed = this.speed;
+
+// 	//  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+// 	this.weapon.fireRate = this.frequency ;
+
+// 	//  Add a variance to the bullet angle by +- this value
+// 	this.weapon.bulletAngleVariance = 0;
+
+// 	//  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
+// 	this.weapon.trackSprite(this,0,0,true);
+// }
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
+  get type() {
+    return 'weapon';
+  }
+  get killType() {
+    return __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Weapon.KILL_WORLD_BOUNDS;
+  }
+
+  constructor({ bullets, x, y, name, layer }) {
+    super(game, 15, 15, name);
+
+    this.layer = layer;
+    this.layer = layer;
+    this.bullets = game.add.weapon(bullets, `${name}-bullet`);
+    this.nextFire;
+
+    // this.anchor.set(0.2);
+    game.physics.enable(this, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE);
+
+    this.bullets.trackSprite(this);
+    this.bullets.bulletKillType = this.killType;
+    this.bullets.bulletAngleOffset = 90;
+    this.bullets.bulletSpeed = 400;
+
+    // this.body.bounce.y = 0.2;
+    // this.body.collideWorldBounds = true;
+    this.body.moves = false;
+  }
+
+  // update() {
+  //   game.physics.arcade.collide(this, this.layer);
+
+  //   const rotation = game.physics.arcade.angleToPointer(this);
+  //   const degrees = rotation * (180/Math.PI);
+
+  //   if(degrees > 120 || degrees < -120){
+  //     // this.scale.x = this.scale.x * -1
+  //     this.rotation = rotation;      
+  //   }
+
+  //   // console.info(this.rotation)
+
+  //   if (game.input.activePointer.isDown) {
+  //     // this.fire();
+  //   }    
+  // }
+
+  fire() {
+    if (game.time.now > this.nextFire && bullets.countDead() > 0) {
+      this.nextFire = game.time.now + fireRate;
+      var bullet = bullets.getFirstDead();
+
+      bullet.reset(sprite.x - 8, sprite.y - 8);
+
+      game.physics.arcade.moveToPointer(bullet, 300);
+    }
+  }
+
+  rotate(orientation, rotation) {
+    let val = 1;
+    if (orientation === 'left') {
+      val = -1;
+    }
+    const degrees = rotation * (180 / Math.PI) * val;
+
+    console.info(orientation, rotation);
+    if (degrees > -50 && degrees < 50 && orientation === 'right') {
+      this.rotation = rotation;
+    }
+    if (degrees < -120 && degrees < 120 && orientation === 'left') {
+      this.rotation = rotation;
+    }
+
+    // this.anchor.setTo(.5, 1); 
+    //so it flips around its middle 
+
+    // this.scale.x = 1; 
+    //facing default direction 
+
+    // this.scale.x = -1; //flipped
+
+
+    // // || (degrees > -50 && degrees < 50 && orientation === 'left'))
+    // {
+    // }
+
+    this.scale.x = val;
+  }
 });
+
+// var sprite;
+// var weapon;
+// var cursors;
+// var fireButton;
+
+// function create() {
+
+//     //  Creates 1 single bullet, using the 'bullet' graphic
+//     weapon = game.add.weapon(1, 'bullet');
+
+//     //  The bullet will be automatically killed when it leaves the world bounds
+//     weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+
+//     //  Because our bullet is drawn facing up, we need to offset its rotation:
+//     weapon.bulletAngleOffset = 90;
+
+//     //  The speed at which the bullet is fired
+//     weapon.bulletSpeed = 400;
+
+//     sprite = this.add.sprite(320, 500, 'ship');
+
+//     game.physics.arcade.enable(sprite);
+
+//     //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
+//     weapon.trackSprite(sprite, 14, 0);
+
+//     cursors = this.input.keyboard.createCursorKeys();
+
+//     fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+
+// }
+
+// function update() {
+
+
+//     // sprite.body.velocity.x = 0;
+
+//     // if (cursors.left.isDown)
+//     // {
+//     //     sprite.body.velocity.x = -200;
+//     // }
+//     // else if (cursors.right.isDown)
+//     // {
+//     //     sprite.body.velocity.x = 200;
+//     // }
+
+//     // if (fireButton.isDown)
+//     // {
+//     //     weapon.fire();
+//     // }
+
+// }
 
 /***/ })
 ],[128]);
