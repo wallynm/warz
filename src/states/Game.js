@@ -32,29 +32,72 @@ export default class extends Phaser.State {
     
     const bannerText = 'Stick Wars Fck Yeah'
     let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
-    banner.font = 'Bangers'
-    banner.padding.set(10, 16)
-    banner.fontSize = 40
-    banner.fill = '#77BFA3'
-    banner.smoothed = false
-    banner.anchor.setTo(0.5)
+    banner.font = 'Bangers';
+    banner.padding.set(10, 16);
+    banner.fontSize = 40;
+    banner.fill = '#77BFA3';
+    banner.smoothed = false;
+    banner.anchor.setTo(0.5);
+
+    const items = game.add.group();
+    items.enableBody = true;
+    items.physicsBodyType = Phaser.Physics.ARCADE;
+    game.physics.enable(items, Phaser.Physics.ARCADE);
+
+    const players = game.add.group();
+    players.enableBody = true;
+    players.physicsBodyType = Phaser.Physics.ARCADE;
+    game.physics.enable(players, Phaser.Physics.ARCADE);
     
-    this.items = [
-      new Crusher({
-        layer,      
-        bullets: 0,
-        // player: this.player,
-        x: this.world.centerX,
-        y: this.world.centerY,
-      })
-    ]
-        
-    this.player = new Player({
-      items: this.items,
+    const baseWeapon1 = new Crusher({
+      layer,      
+      bullets: 1
+    });
+
+    const baseWeapon2 = new Crusher({
+      layer,      
+      bullets: 1,
+      x: this.world.centerX + 200,
+      y: this.world.centerY,
+    });
+
+    const baseWeapon3 = new Crusher({
+      layer,      
+      bullets: 1,
+      x: this.world.centerX + 400,
+      y: this.world.centerY + 200,
+    });
+
+    items.addChild(baseWeapon2);
+    items.addChild(baseWeapon3);
+    
+    players.addChild(new Player({
+      items: [baseWeapon1],
       layer,
       x: this.world.centerX,
       y: this.world.centerY,
-    });
-    
+    }));
+
+    game.global = {
+      items,
+      players,
+      sound: false
+    }
+  }
+
+  update(){
+  
+    game.physics.arcade.collide(game.global.players, game.global.items, this.itemCollision, null, this);
+  }
+
+  itemCollision(player, item){
+    console.info(player, item)
+    player.equipNewItem(item);
+    // item.kill();
+    // console.info('what?', item, player);
+  }
+
+  render(){
+    game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");    
   }
 }

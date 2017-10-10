@@ -36,65 +36,74 @@
 import Phaser from "phaser";
 
 export default class extends Phaser.Sprite {
-  get type(){
+  constructor({ bullets, x, y, name, layer }) {
+    super(game, x, y, name);
+    
+    this.equiped = false;
+    this.layer = layer;
+    this.nextFire = 0;
+    this.bullets = game.add.weapon(bullets, `${name}-bullet`);
+    this.bullets.enableBody = true;
+    this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    // this.anchor.set(0.2);
+
+
+    game.physics.enable(this, Phaser.Physics.ARCADE);
+
+    this.bullets.trackSprite(this, 0, 0, true);
+
+    this.bullets.bulletKillType = this.killType;
+    this.bullets.bulletAngleOffset = 90;
+    this.bullets.bulletSpeed = 800;   
+    this.body.bounce.y = 0.2;
+    this.body.collideWorldBounds = true;
+    // this.game.add.existing(this);
+  }
+
+ get type(){
     return 'weapon'
   }
   get killType(){
     return Phaser.Weapon.KILL_WORLD_BOUNDS;
   }
 
-  constructor({ bullets, x, y, name, layer }) {
-    super(game, 15, 15, name);
-    
-    this.layer = layer;
-    this.layer = layer;
-    this.bullets = game.add.weapon(bullets, `${name}-bullet`);
-    this.nextFire;
-
-    // this.anchor.set(0.2);
-    game.physics.enable(this, Phaser.Physics.ARCADE);
-    
-    this.bullets.trackSprite(this);
-    this.bullets.bulletKillType = this.killType;
-    this.bullets.bulletAngleOffset = 90;
-    this.bullets.bulletSpeed = 400;
-
-    
-    
-    // this.body.bounce.y = 0.2;
-    // this.body.collideWorldBounds = true;
-    this.body.moves = false    
-    
+  get fireDelay() {
+    return 0;
   }
 
+  get equipedPosY(){
+    return 0;
+  }
 
-  // update() {
-  //   game.physics.arcade.collide(this, this.layer);
-    
-  //   const rotation = game.physics.arcade.angleToPointer(this);
-  //   const degrees = rotation * (180/Math.PI);
+  get equipedPosX(){
+    return 0;
+  }
 
-  //   if(degrees > 120 || degrees < -120){
-  //     // this.scale.x = this.scale.x * -1
-  //     this.rotation = rotation;      
-  //   }
-
-  //   // console.info(this.rotation)
-
-  //   if (game.input.activePointer.isDown) {
-  //     // this.fire();
-  //   }    
-  // }
-  
-  fire() {
-    if (game.time.now > this.nextFire && bullets.countDead() > 0) {
-      this.nextFire = game.time.now + fireRate;
-      var bullet = bullets.getFirstDead();
-      
-      bullet.reset(sprite.x - 8, sprite.y - 8);
-      
-      game.physics.arcade.moveToPointer(bullet, 300);
+  update(){
+    game.physics.arcade.collide(this, this.layer);    
+    game.physics.arcade.collide(this.bullets.bullets, this.layer, this.hitFloor, null, this);
+    if(game.input.activePointer.isDown && this.equiped){
+      this.fire();
     }
+  }
+
+  equip(){
+    this.y = this.equipedPosY;
+    this.x = this.equipedPosX;
+    this.body.moves = false;
+    this.anchor.setTo(0.2);
+    this.equiped = true;
+  }
+
+  fire() {
+    if (game.time.now >= this.nextFire) {
+      this.nextFire = game.time.now + this.fireDelay;
+      this.bullets.fire();      
+    }
+  }
+
+  hitFloor(bullet, floor) {
+    bullet.kill();
   }
 
   rotate(orientation, rotation) {
@@ -102,14 +111,24 @@ export default class extends Phaser.Sprite {
     if(orientation === 'left'){
       val = -1
     }
-    const degrees = ((rotation) * (180/Math.PI)) * val;
+
+    const degrees = Phaser.Math.radToDeg(rotation * val);
+    const degreesRight = (degrees > -50 && degrees < 50);
+    const degreesLeft = (degrees < -120 && degrees < 120);
+
     
-    console.info(orientation, rotation)
-    if(degrees > -50 && degrees < 50 && orientation === 'right'){
-      this.rotation = rotation;      
-    }
-    if(degrees < -120 && degrees < 120 && orientation === 'left'){
+    if(degreesRight || degreesLeft){
       this.rotation = rotation;
+    }
+
+    if(orientation === 'right'){
+      this.scale.x = val;
+      this.scale.y = val;
+      // this.rotation = Phaser.Math.reverseAngle(this.rotation);
+    } else {
+      this.scale.y = val;
+      this.scale.x = -val;
+      // this.rotation = Phaser.Math.reverseAngle(this.rotation);
     }
 
     // this.anchor.setTo(.5, 1); 
@@ -125,7 +144,6 @@ export default class extends Phaser.Sprite {
     // {
     // }
 
-    this.scale.x = val;
 
   }
 }
