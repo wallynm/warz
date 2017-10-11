@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
 const PLAYER_VELOCITY = 150;
+const BACK_VELOCITY_APPLIER = 0.5;
 
 export default class extends Phaser.Sprite {
   constructor({ x, y, layer, items }) {
@@ -52,9 +53,60 @@ export default class extends Phaser.Sprite {
 
   update() {
     game.physics.arcade.collide(this, this.layer);
-    
+    let velocityMultiplier = 1;
+
     const weapon = (this.equipedWeapon === null) ? null : this.items[this.equipedWeapon];
     const rotation = game.physics.arcade.angleToPointer(this);
+    const mouseFacingLeft = (rotation <= 1.5 && rotation >= -1.5);
+
+    if(mouseFacingLeft){
+      // this.frame = 5;
+      this.animations.play("right");
+      this.facing = "right";
+    } else {
+      // this.frame = 0;
+      this.animations.play("left");
+      this.facing = "left";
+    }
+
+    console.info(this.animations.currentAnim.speed )
+
+    if (this.commands.left.isDown) {
+      if(mouseFacingLeft){
+        this.animations.currentAnim.speed = 6        
+        velocityMultiplier = BACK_VELOCITY_APPLIER;
+      }
+      this.body.velocity.x = (-PLAYER_VELOCITY) * velocityMultiplier;
+    } else if (this.commands.right.isDown ) {
+      if(!mouseFacingLeft){
+        this.animations.currentAnim.speed = 6        
+        velocityMultiplier = BACK_VELOCITY_APPLIER;
+      }
+      this.body.velocity.x = (PLAYER_VELOCITY) * velocityMultiplier;
+    } else {
+      this.frame = (mouseFacingLeft) ? 5 : 0;
+      this.body.velocity.x = 0;
+    }
+
+
+
+    //     if (this.facing != "left") {
+    //       this.animations.play("left");
+    //       this.facing = "left";
+    //     }
+    //   } else if (this.commands.right.isDown && ) {
+    //     this.body.velocity.x = PLAYER_VELOCITY;
+
+    //     if (this.facing != "right") {
+    //       this.animations.play("right");
+    //       this.facing = "right";
+    //     }
+    //   } else {
+    //     if (this.facing == "left") {
+    //     } else {
+    //     }
+    //   }
+    // }
     
     if(weapon){
       weapon.update();    
@@ -62,29 +114,7 @@ export default class extends Phaser.Sprite {
 
     
     game.physics.arcade.collide(this, this.layer);
-    this.body.velocity.x = 0;
 
-    if (this.commands.left.isDown) {
-      this.body.velocity.x = -PLAYER_VELOCITY;
-
-      if (this.facing != "left") {
-        this.animations.play("left");
-        this.facing = "left";
-      }
-    } else if (this.commands.right.isDown) {
-      this.body.velocity.x = PLAYER_VELOCITY;
-
-      if (this.facing != "right") {
-        this.animations.play("right");
-        this.facing = "right";
-      }
-    } else {
-      if (this.facing == "left") {
-        this.frame = 0;
-      } else {
-        this.frame = 5;
-      }
-    }
 
     if(weapon) {
       weapon.rotate(this.facing, rotation);

@@ -10883,6 +10883,7 @@ const centerGameObjects = objects => {
 
 
 const PLAYER_VELOCITY = 150;
+const BACK_VELOCITY_APPLIER = 0.5;
 
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
   constructor({ x, y, layer, items }) {
@@ -10933,38 +10934,64 @@ const PLAYER_VELOCITY = 150;
 
   update() {
     game.physics.arcade.collide(this, this.layer);
+    let velocityMultiplier = 1;
 
     const weapon = this.equipedWeapon === null ? null : this.items[this.equipedWeapon];
     const rotation = game.physics.arcade.angleToPointer(this);
+    const mouseFacingLeft = rotation <= 1.5 && rotation >= -1.5;
+
+    if (mouseFacingLeft) {
+      // this.frame = 5;
+      this.animations.play("right");
+      this.facing = "right";
+    } else {
+      // this.frame = 0;
+      this.animations.play("left");
+      this.facing = "left";
+    }
+
+    console.info(this.animations.currentAnim.speed);
+
+    if (this.commands.left.isDown) {
+      if (mouseFacingLeft) {
+        this.animations.currentAnim.speed = 6;
+        velocityMultiplier = BACK_VELOCITY_APPLIER;
+      }
+      this.body.velocity.x = -PLAYER_VELOCITY * velocityMultiplier;
+    } else if (this.commands.right.isDown) {
+      if (!mouseFacingLeft) {
+        this.animations.currentAnim.speed = 6;
+        velocityMultiplier = BACK_VELOCITY_APPLIER;
+      }
+      this.body.velocity.x = PLAYER_VELOCITY * velocityMultiplier;
+    } else {
+      this.frame = mouseFacingLeft ? 5 : 0;
+      this.body.velocity.x = 0;
+    }
+
+    //     if (this.facing != "left") {
+    //       this.animations.play("left");
+    //       this.facing = "left";
+    //     }
+    //   } else if (this.commands.right.isDown && ) {
+    //     this.body.velocity.x = PLAYER_VELOCITY;
+
+    //     if (this.facing != "right") {
+    //       this.animations.play("right");
+    //       this.facing = "right";
+    //     }
+    //   } else {
+    //     if (this.facing == "left") {
+    //     } else {
+    //     }
+    //   }
+    // }
 
     if (weapon) {
       weapon.update();
     }
 
     game.physics.arcade.collide(this, this.layer);
-    this.body.velocity.x = 0;
-
-    if (this.commands.left.isDown) {
-      this.body.velocity.x = -PLAYER_VELOCITY;
-
-      if (this.facing != "left") {
-        this.animations.play("left");
-        this.facing = "left";
-      }
-    } else if (this.commands.right.isDown) {
-      this.body.velocity.x = PLAYER_VELOCITY;
-
-      if (this.facing != "right") {
-        this.animations.play("right");
-        this.facing = "right";
-      }
-    } else {
-      if (this.facing == "left") {
-        this.frame = 0;
-      } else {
-        this.frame = 5;
-      }
-    }
 
     if (weapon) {
       weapon.rotate(this.facing, rotation);
@@ -11070,7 +11097,6 @@ const PLAYER_VELOCITY = 150;
     this.bullets.physicsBodyType = __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE;
     // this.anchor.set(0.2);
 
-
     game.physics.enable(this, __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Physics.ARCADE);
 
     this.bullets.trackSprite(this, 0, 0, true);
@@ -11080,6 +11106,7 @@ const PLAYER_VELOCITY = 150;
     this.bullets.bulletSpeed = 800;
     this.body.bounce.y = 0.2;
     this.body.collideWorldBounds = true;
+    // this.body.setSize(20, 32, 5, 16);    
     // this.game.add.existing(this);
   }
 
@@ -11136,12 +11163,13 @@ const PLAYER_VELOCITY = 150;
     }
 
     const degrees = __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Math.radToDeg(rotation * val);
+    // console.info(degrees)
     const degreesRight = degrees > -50 && degrees < 50;
-    const degreesLeft = degrees < -120 && degrees < 120;
+    const degreesLeft = degrees < -100 && degrees > 180 || degrees > 120 && degrees < 180;
 
-    if (degreesRight || degreesLeft) {
-      this.rotation = rotation;
-    }
+    // if(degreesRight || degreesLeft){
+    this.rotation = rotation;
+    // }
 
     if (orientation === 'right') {
       this.scale.x = val;

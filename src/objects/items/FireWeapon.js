@@ -46,8 +46,7 @@ export default class extends Phaser.Sprite {
     this.bullets.enableBody = true;
     this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
     // this.anchor.set(0.2);
-
-
+    
     game.physics.enable(this, Phaser.Physics.ARCADE);
 
     this.bullets.trackSprite(this, 0, 0, true);
@@ -57,6 +56,7 @@ export default class extends Phaser.Sprite {
     this.bullets.bulletSpeed = 800;   
     this.body.bounce.y = 0.2;
     this.body.collideWorldBounds = true;
+    // this.body.setSize(20, 32, 5, 16);    
     // this.game.add.existing(this);
   }
 
@@ -113,13 +113,14 @@ export default class extends Phaser.Sprite {
     }
 
     const degrees = Phaser.Math.radToDeg(rotation * val);
+    // console.info(degrees)
     const degreesRight = (degrees > -50 && degrees < 50);
-    const degreesLeft = (degrees < -120 && degrees < 120);
+    const degreesLeft = ((degrees < -100 && degrees> 180 ) || (degrees > 120 && degrees < 180));
 
     
-    if(degreesRight || degreesLeft){
+    // if(degreesRight || degreesLeft){
       this.rotation = rotation;
-    }
+    // }
 
     if(orientation === 'right'){
       this.scale.x = val;
