@@ -5,7 +5,7 @@ export default class extends RangedWeapon {
   constructor(options) {
     super({name: 'crusher', ...options});
 
-    this.fireDelay = 1000;
+    this.fireDelay = 0;
     this.equipedPosY = 15;
     this.equipedPosX = 0;
     this.anchor.set(.1, .5);    
@@ -13,29 +13,25 @@ export default class extends RangedWeapon {
     // this.bullets.addBulletAnimation('crusher-shoot', null, 30, false, false);
     // this.bullets.bulletAnimation = 'crusher-shoot';
 
-    this.bullets.bulletSpeed = 800;
+    this.bullets.bulletSpeed = 1000;
     // this.bullets.enableBody = false;
     
     this.bullets.bulletKillType = Phaser.Weapon.KILL_LIFESPAN
-    this.bullets.bulletLifespan = 540;
-    this.bullets.bulletGravity.y = -450;
+    this.bullets.bulletLifespan = 54000;
+    this.bullets.bulletGravity.y = -550;
     // this.bullets.bulletAngleOffset = 0; 
-    this.bullets.trackOffset.x = 30;   
-    this.bullets.trackOffset.y = 2;
+    this.bullets.trackOffset.x = 40;   
+    this.bullets.trackOffset.y = -2;
     this.bullets.fireLimit = 12;
-    this.bullets.fireRate = 60;
+    this.bullets.fireRate = 1;
     // this.bullets.bulletAngleVariance = 30;
   }
   
-  hitFloor(bullet, floor) {
-    bullet.kill();
-  }
-
-  fire(){
-    if (game.time.now >= this.nextFire) {
-      this.nextFire = game.time.now + this.fireDelay;
-      // this.bullets.fireMany([1, 100, 200, 300]);
-      this.bullets.fire();
-    }
-  }
+  // fire(){
+  //   // if (game.time.now >= this.nextFire) {
+  //     // this.nextFire = game.time.now + this.fireDelay;
+  //     // this.bullets.fireMany([1, 100, 200, 300]);
+  //     this.bullets.fire();
+  //   // }
+  // }
 }

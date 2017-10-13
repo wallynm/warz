@@ -30,14 +30,43 @@ export default class extends Phaser.State {
     
     game.physics.arcade.gravity.y = 550;
     
-    const bannerText = 'Stick Wars Fck Yeah'
-    let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
+    const banner = this.add.text(this.world.centerX, this.game.height - 80, 'Stick Wars Fck Yeah')
     banner.font = 'Bangers';
     banner.padding.set(10, 16);
     banner.fontSize = 40;
-    banner.fill = '#77BFA3';
-    banner.smoothed = false;
+    banner.fill = 'green';
+    banner.smoothed = true;
     banner.anchor.setTo(0.5);
+    banner.fixedToCamera = true;
+    let life = '';
+    life = this.add.text(this.world.centerX, this.game.height - 80, 100)
+    life.font = 'Bangers';
+    life.padding.set(10, 16);
+    life.fontSize = 16;
+    life.fill = 'red';
+    life.smoothed = true;
+    life.anchor.setTo(0.5);
+    life.fixedToCamera = true;
+    life.x = 50
+    life.y = 50
+
+    let bullets = this.add.text(this.world.centerX, this.game.height - 40, 0)
+    bullets.font = 'Bangers';
+    bullets.padding.set(10, 16);
+    bullets.fontSize = 16;
+    bullets.fill = 'red';
+    bullets.smoothed = true;
+    bullets.anchor.setTo(0.5);
+    bullets.fixedToCamera = true;
+    bullets.x = 100    
+    bullets.y = 100    
+
+    game.global = {};
+    game.global.ui = {
+      labels: {
+        life, bullets, banner
+      }
+    }
 
     const items = game.add.group();
     items.enableBody = true;
@@ -73,17 +102,15 @@ export default class extends Phaser.State {
     // items.addChild(baseWeapon3);
     
     players.addChild(new Player({
-      items: [baseWeapon1],
+      inventory: [baseWeapon1],
       layer,
       x: this.world.centerX,
       y: this.world.centerY,
     }));
 
-    game.global = {
-      items,
-      players,
-      sound: false
-    }
+    game.global.items = items;
+    game.global.players = players;
+    game.global.sound = false;
   }
 
   update(){
@@ -94,7 +121,7 @@ export default class extends Phaser.State {
   itemCollision(player, item){
     // console.info(player, item)
     game.global.items.removeChild(item);
-    player.addIventoryItem(item);
+    player.inventory = item;
     // item.kill();
     // console.info('what?', item, player);
   }

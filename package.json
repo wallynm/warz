@@ -30,6 +30,7 @@
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "lodash": "^4.17.4",
     "phaser-ce": "^2.8.3",
     "webfontloader": "^1.6.28"
   }

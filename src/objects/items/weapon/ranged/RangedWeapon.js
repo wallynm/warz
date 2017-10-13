@@ -14,7 +14,10 @@ export default class extends BaseItem {
     this.bullets.trackSprite(this, 0, 0, true);
     this.bullets.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
     this.bullets.bulletAngleOffset = 90;
-    this.bullets.bulletSpeed = 800;   
+    this.bullets.bulletSpeed = 800;
+
+    this._bulletsRemaining = this.bullets.fireLimit;
+    
     
     // this.body.bounce.y = 0.2;
     // this.body.collideWorldBounds = true;
@@ -24,8 +27,8 @@ export default class extends BaseItem {
   }
 
   update(){
-    game.physics.arcade.collide(this, this.layer);
-    game.physics.arcade.collide(this.bullets.bullets, this.layer, this.hitFloor, null, this);
+    game.physics.arcade.collide(this, this.data.layer);
+    game.physics.arcade.collide(this.bullets.bullets, this.data.layer, this.hitFloor, null, this);
   }
 
   equip(){
@@ -35,12 +38,16 @@ export default class extends BaseItem {
     this.body.moves = false;
     this.body.enable = false;
     this.body.moves = false;
+    game.global.ui.labels.bullets.text = this.bullets.fireLimit;
   }
 
   fire() {
     if (game.time.now >= this.nextFire) {
       this.nextFire = game.time.now + this.fireDelay;
       this.bullets.fire();
+      this._bulletsRemaining -= 1;
+      console.info(this.bullets.shots, this.bullets)
+      game.global.ui.labels.bullets.text = this._bulletsRemaining;
     }
   }
 
