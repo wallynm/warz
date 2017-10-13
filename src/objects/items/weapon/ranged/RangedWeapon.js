@@ -3,19 +3,13 @@ import BaseItem  from '../../BaseItem';
 
 export default class extends BaseItem {
   constructor(options) {
-    super(options);
+    super({type: 'weapon', ...options});
     
-    this.type = 'weapon';
-    this.equiped = false;
+    this.fireDelay = 0;    
     this.nextFire = 0;
     this.equipedPosX = 0;
     this.equipedPosY = 0;
     this.bullets = game.add.weapon(options.bullets, `${options.name}-bullet`);
-    
-
-
-    
-    // game.physics.enable(this, Phaser.Physics.ARCADE);
 
     this.bullets.trackSprite(this, 0, 0, true);
     this.bullets.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
@@ -27,7 +21,6 @@ export default class extends BaseItem {
     // this.body.setSize(20, 32, 5, 16);    
     this.game.add.existing(this);
 
-    this.fireDelay = 0;
   }
 
   update(){
@@ -42,7 +35,6 @@ export default class extends BaseItem {
     this.body.moves = false;
     this.body.enable = false;
     this.body.moves = false;
-    this.equiped = true;
   }
 
   fire() {

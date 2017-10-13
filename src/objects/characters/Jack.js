@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
 const PLAYER_VELOCITY = 150;
-const BACK_VELOCITY_APPLIER = 0.5;
+const BACKWARDS_REDUCER = 0.5;
 
 export default class extends Phaser.Sprite {
   constructor({ x, y, layer, items }) {
@@ -65,11 +65,9 @@ export default class extends Phaser.Sprite {
     const mouseFacingLeft = (rotation <= 1.5 && rotation >= -1.5);
 
     if(mouseFacingLeft){
-      // this.frame = 5;
       this.animations.play("right");
       this.facing = "right";
     } else {
-      // this.frame = 0;
       this.animations.play("left");
       this.facing = "left";
     }
@@ -77,13 +75,13 @@ export default class extends Phaser.Sprite {
     if (this.commands.left.isDown) {
       if(mouseFacingLeft){
         this.animations.currentAnim.speed = 6        
-        velocityMultiplier = BACK_VELOCITY_APPLIER;
+        velocityMultiplier = BACKWARDS_REDUCER;
       }
       this.body.velocity.x = (-PLAYER_VELOCITY) * velocityMultiplier;
     } else if (this.commands.right.isDown ) {
       if(!mouseFacingLeft){
         this.animations.currentAnim.speed = 6        
-        velocityMultiplier = BACK_VELOCITY_APPLIER;
+        velocityMultiplier = BACKWARDS_REDUCER;
       }
       this.body.velocity.x = (PLAYER_VELOCITY) * velocityMultiplier;
     } else {

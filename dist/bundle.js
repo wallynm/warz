@@ -10886,7 +10886,7 @@ const centerGameObjects = objects => {
 
 
 const PLAYER_VELOCITY = 150;
-const BACK_VELOCITY_APPLIER = 0.5;
+const BACKWARDS_REDUCER = 0.5;
 
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
   constructor({ x, y, layer, items }) {
@@ -10949,11 +10949,9 @@ const BACK_VELOCITY_APPLIER = 0.5;
     const mouseFacingLeft = rotation <= 1.5 && rotation >= -1.5;
 
     if (mouseFacingLeft) {
-      // this.frame = 5;
       this.animations.play("right");
       this.facing = "right";
     } else {
-      // this.frame = 0;
       this.animations.play("left");
       this.facing = "left";
     }
@@ -10961,13 +10959,13 @@ const BACK_VELOCITY_APPLIER = 0.5;
     if (this.commands.left.isDown) {
       if (mouseFacingLeft) {
         this.animations.currentAnim.speed = 6;
-        velocityMultiplier = BACK_VELOCITY_APPLIER;
+        velocityMultiplier = BACKWARDS_REDUCER;
       }
       this.body.velocity.x = -PLAYER_VELOCITY * velocityMultiplier;
     } else if (this.commands.right.isDown) {
       if (!mouseFacingLeft) {
         this.animations.currentAnim.speed = 6;
-        velocityMultiplier = BACK_VELOCITY_APPLIER;
+        velocityMultiplier = BACKWARDS_REDUCER;
       }
       this.body.velocity.x = PLAYER_VELOCITY * velocityMultiplier;
     } else {
@@ -11010,11 +11008,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_1__RangedWeapon__["a" /* default */] {
   constructor(options) {
-    console.info();
     super(_extends({ name: 'crusher' }, options));
+
     this.fireDelay = 1000;
-    this.equipedPosY = 10;
-    this.equipedPosX = 3;
+    this.equipedPosY = 15;
+    this.equipedPosX = 0;
+    this.anchor.set(.1, .5);
 
     // this.bullets.addBulletAnimation('crusher-shoot', null, 30, false, false);
     // this.bullets.bulletAnimation = 'crusher-shoot';
@@ -11059,21 +11058,20 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser__ = __webpack_require__(/*! phaser */ 27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_phaser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_phaser__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__BaseItem__ = __webpack_require__(/*! ../../BaseItem */ 344);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 
 
 
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_1__BaseItem__["a" /* default */] {
   constructor(options) {
-    super(options);
+    super(_extends({ type: 'weapon' }, options));
 
-    this.type = 'weapon';
-    this.equiped = false;
+    this.fireDelay = 0;
     this.nextFire = 0;
     this.equipedPosX = 0;
     this.equipedPosY = 0;
     this.bullets = game.add.weapon(options.bullets, `${options.name}-bullet`);
-
-    // game.physics.enable(this, Phaser.Physics.ARCADE);
 
     this.bullets.trackSprite(this, 0, 0, true);
     this.bullets.bulletKillType = __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Weapon.KILL_WORLD_BOUNDS;
@@ -11084,8 +11082,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     // this.body.collideWorldBounds = true;
     // this.body.setSize(20, 32, 5, 16);    
     this.game.add.existing(this);
-
-    this.fireDelay = 0;
   }
 
   update() {
@@ -11100,7 +11096,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     this.body.moves = false;
     this.body.enable = false;
     this.body.moves = false;
-    this.equiped = true;
   }
 
   fire() {
@@ -11223,8 +11218,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 /* harmony default export */ __webpack_exports__["a"] = (class extends __WEBPACK_IMPORTED_MODULE_0_phaser___default.a.Sprite {
-  constructor({ x, y, name, layer }) {
+  constructor({ x, y, name, layer, type }) {
     super(game, x, y, name);
+    console.info(this);
+    // this.type = type;
+    // this.name = name;
     this.layer = layer;
   }
 });

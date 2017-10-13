@@ -3,12 +3,13 @@ import RangedWeapon from "./RangedWeapon"
 
 export default class extends RangedWeapon {
   constructor(options) {
-    console.info()
     super({name: 'crusher', ...options});
-    this.fireDelay = 1000;
-    this.equipedPosY = 10;
-    this.equipedPosX = 3;
 
+    this.fireDelay = 1000;
+    this.equipedPosY = 15;
+    this.equipedPosX = 0;
+    this.anchor.set(.1, .5);    
+    
     // this.bullets.addBulletAnimation('crusher-shoot', null, 30, false, false);
     // this.bullets.bulletAnimation = 'crusher-shoot';
 
