@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 import Mushroom from '../objects/characters/Mushroom'
 import Player from '../objects/characters/Jack'
 
-import Crusher from '../objects/items/Crusher'
+import Crusher from '../objects/items/weapon/ranged/Crusher'
 
 export default class extends Phaser.State {
   init () {}
@@ -11,7 +11,7 @@ export default class extends Phaser.State {
   
   create () {
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.stage.backgroundColor = '#000000';
+    // game.stage.backgroundColor = '#FFF';
     
     const bg = game.add.tileSprite(0, 0, 800, 600, 'background');
     bg.fixedToCamera = true;
@@ -45,7 +45,7 @@ export default class extends Phaser.State {
     game.physics.enable(items, Phaser.Physics.ARCADE);
 
     const players = game.add.group();
-    players.enableBody = true;
+    // players.enableBody = true;
     players.physicsBodyType = Phaser.Physics.ARCADE;
     game.physics.enable(players, Phaser.Physics.ARCADE);
     
@@ -68,8 +68,9 @@ export default class extends Phaser.State {
       y: this.world.centerY + 200,
     });
 
-    items.addChild(baseWeapon2);
-    items.addChild(baseWeapon3);
+    items.addMultiple([baseWeapon1, baseWeapon2, baseWeapon3]);
+    // items.addChild(baseWeapon2);
+    // items.addChild(baseWeapon3);
     
     players.addChild(new Player({
       items: [baseWeapon1],
@@ -91,8 +92,9 @@ export default class extends Phaser.State {
   }
 
   itemCollision(player, item){
-    console.info(player, item)
-    player.equipNewItem(item);
+    // console.info(player, item)
+    game.global.items.removeChild(item);
+    player.addIventoryItem(item);
     // item.kill();
     // console.info('what?', item, player);
   }

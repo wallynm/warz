@@ -6,7 +6,7 @@ const BACK_VELOCITY_APPLIER = 0.5;
 export default class extends Phaser.Sprite {
   constructor({ x, y, layer, items }) {
     super(game, x, y, "jack");
-    this.items = items || [];
+    this.inventory = items || [];
     this.layer = layer;
     this.anchor.setTo(0.5);
     this.cursors = game.input.keyboard.createCursorKeys();
@@ -38,24 +38,29 @@ export default class extends Phaser.Sprite {
     // this.game.add.existing(this)
   }
 
-  equipNewItem(item) {
-    this.items.push(item);    
+  addIventoryItem(item) {
+    this.inventory.push(item);
+    console.info(item)
     item.equip();
     this.addChild(item);
-    this.equipedWeapon = this.items.indexOf(item);
-  }
+    this.equipedWeapon = this.inventory.indexOf(item);
 
-  equipUserItems() {
-    if(this.items){
-      this.items.forEach((item) => this.equipNewItem(item));
+    if(item === 'weapon'){
+      this.equipWeapon(item);
     }
   }
 
-  update() {
+  equipUserItems() {
+    if(this.inventory){
+      this.inventory.forEach((item) => this.addIventoryItem(item));
+    }
+  }
+
+  update() {    
     game.physics.arcade.collide(this, this.layer);
     let velocityMultiplier = 1;
 
-    const weapon = (this.equipedWeapon === null) ? null : this.items[this.equipedWeapon];
+    const weapon = (this.equipedWeapon === null) ? null : this.inventory[this.equipedWeapon];
     const rotation = game.physics.arcade.angleToPointer(this);
     const mouseFacingLeft = (rotation <= 1.5 && rotation >= -1.5);
 
@@ -68,8 +73,6 @@ export default class extends Phaser.Sprite {
       this.animations.play("left");
       this.facing = "left";
     }
-
-    console.info(this.animations.currentAnim.speed )
 
     if (this.commands.left.isDown) {
       if(mouseFacingLeft){
@@ -87,42 +90,17 @@ export default class extends Phaser.Sprite {
       this.frame = (mouseFacingLeft) ? 5 : 0;
       this.body.velocity.x = 0;
     }
-
-
-
-    //     if (this.facing != "left") {
-    //       this.animations.play("left");
-    //       this.facing = "left";
-    //     }
-    //   } else if (this.commands.right.isDown && ) {
-    //     this.body.velocity.x = PLAYER_VELOCITY;
-
-    //     if (this.facing != "right") {
-    //       this.animations.play("right");
-    //       this.facing = "right";
-    //     }
-    //   } else {
-    //     if (this.facing == "left") {
-    //     } else {
-    //     }
-    //   }
-    // }
     
     if(weapon){
-      weapon.update();    
-    }
-
-    
-    game.physics.arcade.collide(this, this.layer);
-
-
-    if(weapon) {
+      game.input.activePointer.isDown && weapon.fire();
       weapon.rotate(this.facing, rotation);
+      weapon.update();      
     }
 
     if (
       this.commands.jump.isDown &&
-      this.body.onFloor() &&
+      (this.body.onFloor()) &&
+      // (this.body.onFloor() || this.body.onWall() ) &&
       game.time.now > this.jumpTimer
     ) {
       this.body.velocity.y = -250;
