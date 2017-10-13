@@ -5,7 +5,7 @@ export default class extends RangedWeapon {
   constructor(options) {
     super({name: 'crusher', ...options});
 
-    this.fireDelay = 0;
+    this.fireDelay = 1000;
     this.equipedPosY = 15;
     this.equipedPosX = 0;
     this.anchor.set(.1, .5);    
@@ -23,7 +23,7 @@ export default class extends RangedWeapon {
     this.bullets.trackOffset.x = 40;   
     this.bullets.trackOffset.y = -2;
     this.bullets.fireLimit = 12;
-    this.bullets.fireRate = 1;
+    // this.bullets.fireRate = 1;
     // this.bullets.bulletAngleVariance = 30;
   }
   

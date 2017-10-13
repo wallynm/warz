@@ -22,7 +22,7 @@ export default class extends BaseItem {
     // this.body.bounce.y = 0.2;
     // this.body.collideWorldBounds = true;
     // this.body.setSize(20, 32, 5, 16);    
-    this.game.add.existing(this);
+    // this.game.add.existing(this);
 
   }
 
@@ -45,7 +45,7 @@ export default class extends BaseItem {
     if (game.time.now >= this.nextFire) {
       this.nextFire = game.time.now + this.fireDelay;
       this.bullets.fire();
-      this._bulletsRemaining -= 1;
+      this._bulletsRemaining = this._bulletsRemaining - 1;
       console.info(this.bullets.shots, this.bullets)
       game.global.ui.labels.bullets.text = this._bulletsRemaining;
     }

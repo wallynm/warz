@@ -12410,7 +12410,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   constructor(options) {
     super(_extends({ name: 'crusher' }, options));
 
-    this.fireDelay = 0;
+    this.fireDelay = 1000;
     this.equipedPosY = 15;
     this.equipedPosX = 0;
     this.anchor.set(.1, .5);
@@ -12428,7 +12428,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     this.bullets.trackOffset.x = 40;
     this.bullets.trackOffset.y = -2;
     this.bullets.fireLimit = 12;
-    this.bullets.fireRate = 1;
+    // this.bullets.fireRate = 1;
     // this.bullets.bulletAngleVariance = 30;
   }
 
@@ -12479,7 +12479,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     // this.body.bounce.y = 0.2;
     // this.body.collideWorldBounds = true;
     // this.body.setSize(20, 32, 5, 16);    
-    this.game.add.existing(this);
+    // this.game.add.existing(this);
   }
 
   update() {
@@ -12501,7 +12501,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     if (game.time.now >= this.nextFire) {
       this.nextFire = game.time.now + this.fireDelay;
       this.bullets.fire();
-      this._bulletsRemaining -= 1;
+      this._bulletsRemaining = this._bulletsRemaining - 1;
       console.info(this.bullets.shots, this.bullets);
       game.global.ui.labels.bullets.text = this._bulletsRemaining;
     }
